@@ -1,17 +1,25 @@
 const https = require("https");
+const zlib = require("zlib");
 
-function request(options, data) {
+function request(options) {
   return new Promise((resolve, reject) => {
     const req = https.request(options, res => {
-      let body = "";
-      res.on("data", chunk => body += chunk);
-      res.on("end", () => resolve(body));
+
+      let stream = res;
+
+      if (res.headers["content-encoding"] === "gzip") {
+        stream = res.pipe(zlib.createGunzip());
+      }
+
+      let data = "";
+
+      stream.on("data", chunk => data += chunk);
+
+      stream.on("end", () => resolve(data));
+
     });
 
     req.on("error", reject);
-
-    if (data) req.write(data);
-
     req.end();
   });
 }
@@ -24,7 +32,8 @@ async function checkin() {
     method: "POST",
     headers: {
       "cookie": process.env.COOKIE,
-      "user-agent": "Mozilla/5.0"
+      "user-agent": "Mozilla/5.0",
+      "accept-encoding": "gzip"
     }
   };
 
