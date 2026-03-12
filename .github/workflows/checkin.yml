@@ -1,0 +1,18 @@
+name: auto-checkin
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: run checkin
+        run: node checkin.js
+        env:
+          COOKIE: ${{ secrets.COOKIE }}
