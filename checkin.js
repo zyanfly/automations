@@ -21,7 +21,7 @@ const puppeteer = require("puppeteer");
 
   const cookies = raw.map(v=>{
     const p=v.trim().split("=");
-    return { name:p[0], value:p.slice(1).join("="), domain:"https://anyrouter.top" };
+    return { name:p[0], value:p.slice(1).join("="), domain:".anyrouter.top" };
   });
 
   await page.setCookie(...cookies);
@@ -37,7 +37,17 @@ const puppeteer = require("puppeteer");
       body:"{}"
     });
 
-    return await res.json(); 
+    console.log("Response status:", res.status);
+    console.log("Response ok:", res.ok);
+
+    const text = await res.text();
+    console.log("Response text:", text);
+
+    return {
+      status: res.status,
+      ok: res.ok,
+      text: text
+    };
   });
 
   console.log("checkin result:");
