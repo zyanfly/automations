@@ -37,7 +37,7 @@ const puppeteer = require("puppeteer");
       body:"{}"
     });
 
-    return res.text();
+    return await res.json(); 
   });
 
   console.log("checkin result:");
