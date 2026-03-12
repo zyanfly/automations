@@ -1,49 +1,48 @@
-const https = require("https");
-const zlib = require("zlib");
+const puppeteer = require("puppeteer");
 
-function request(options) {
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, res => {
+(async () => {
 
-      let stream = res;
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox","--disable-setuid-sandbox"]
+  });
 
-      if (res.headers["content-encoding"] === "gzip") {
-        stream = res.pipe(zlib.createGunzip());
-      }
+  const page = await browser.newPage();
 
-      let data = "";
+  await page.setExtraHTTPHeaders({
+    "user-agent": "Mozilla/5.0"
+  });
 
-      stream.on("data", chunk => data += chunk);
+  // 先访问首页，让站点生成 acw_sc__v2
+  await page.goto("https://anyrouter.top", { waitUntil: "networkidle2" });
 
-      stream.on("end", () => resolve(data));
+  // 设置登录 cookie
+  const raw = process.env.COOKIE.split(";");
 
+  const cookies = raw.map(v=>{
+    const p=v.trim().split("=");
+    return { name:p[0], value:p.slice(1).join("="), domain:"https://anyrouter.top" };
+  });
+
+  await page.setCookie(...cookies);
+
+  // 在浏览器环境里请求签到接口
+  const result = await page.evaluate(async () => {
+
+    const res = await fetch("/api/user/sign_in",{
+      method:"POST",
+      headers:{
+        "content-type":"application/json"
+      },
+      body:"{}"
     });
 
-    req.on("error", reject);
-    req.end();
+    return res.text();
   });
-}
 
-async function checkin() {
+  console.log("checkin result:");
+  console.log(result);
 
-  const options = {
-    hostname: "anyrouter.top",
-    path: "/api/user/sign_in",
-    method: "POST",
-    headers: {
-      "cookie": process.env.COOKIE,
-      "user-agent": "Mozilla/5.0",
-      "accept-encoding": "gzip"
-    }
-  };
+  await browser.close();
 
-  try {
-    const res = await request(options);
-    console.log("checkin result:");
-    console.log(res);
-  } catch (err) {
-    console.error("checkin error:", err);
-  }
-}
-
-checkin();
+})();
