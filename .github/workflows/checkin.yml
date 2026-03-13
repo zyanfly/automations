@@ -12,8 +12,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
       - run: npm install
 
-      - run: node checkin.js
+      - run: node scripts/checkin.js
         env:
           COOKIE: ${{ secrets.COOKIE }}

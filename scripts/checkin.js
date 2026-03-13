@@ -1,9 +1,22 @@
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
+
+/**
+ * 自动识别环境中的浏览器路径
+ * GitHub Actions (ubuntu-latest) 预装了 google-chrome
+ */
+const getExecutablePath = () => {
+  if (process.env.CHROME_PATH) return process.env.CHROME_PATH;
+  if (process.platform === "linux") return "/usr/bin/google-chrome";
+  if (process.platform === "darwin") return "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+  return undefined;
+};
+
 
 (async () => {
 
   const browser = await puppeteer.launch({
     headless: true,
+    executablePath: getExecutablePath(),
     args: ["--no-sandbox","--disable-setuid-sandbox"]
   });
 
