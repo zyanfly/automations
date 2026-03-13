@@ -30,7 +30,7 @@ const getExecutablePath = () => {
   await page.goto("https://anyrouter.top", { waitUntil: "networkidle2" });
 
   // 设置登录 cookie
-  const raw = process.env.COOKIE.split(";");
+  const raw = (process.env.ANYROUTER_COOKIE || "").split(";");
 
   const cookies = raw.map(v=>{
     const p=v.trim().split("=");
@@ -68,4 +68,57 @@ const getExecutablePath = () => {
 
   await browser.close();
 
+  // 发送通知
+  await sendNotification(result);
+
 })();
+
+/**
+ * 发送推送通知 (PushPlus)
+ */
+async function sendNotification(result) {
+  const token = process.env.PUSHPLUS_TOKEN;
+  if (!token) {
+    console.log("未配置 PUSHPLUS_TOKEN，跳过推送");
+    return;
+  }
+
+  const https = require("https");
+  const title = `AnyRouter 签到结果: ${result.ok ? "成功" : "失败"}`;
+  const content = `状态码: ${result.status}\n结果: ${result.text}`;
+
+  const data = JSON.stringify({
+    token: token,
+    title: title,
+    content: content,
+    template: "html"
+  });
+
+  const options = {
+    hostname: "www.pushplus.plus",
+    path: "/send",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": data.length
+    }
+  };
+
+  return new Promise((resolve) => {
+    const req = https.request(options, (res) => {
+      res.on("data", () => {});
+      res.on("end", () => {
+        console.log("通知发送完成");
+        resolve();
+      });
+    });
+
+    req.on("error", (e) => {
+      console.error("通知发送失败:", e);
+      resolve();
+    });
+
+    req.write(data);
+    req.end();
+  });
+}
