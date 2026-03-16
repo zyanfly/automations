@@ -106,9 +106,13 @@ async function sendNotification(result) {
 
   return new Promise((resolve) => {
     const req = https.request(options, (res) => {
-      res.on("data", () => {});
+      let resultData = "";
+      res.on("data", (chunk) => {
+        resultData += chunk;
+      });
       res.on("end", () => {
-        console.log("通知发送完成");
+        console.log(`通知发送完成，状态码: ${res.statusCode}`);
+        console.log("推送响应:", resultData);
         resolve();
       });
     });
