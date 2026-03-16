@@ -87,6 +87,7 @@ async function sendNotification(result) {
   const title = `AnyRouter 签到结果: ${result.ok ? "成功" : "失败"}`;
   const content = `状态码: ${result.status}\n结果: ${result.text}`;
 
+  console.log(`准备发送通知，Token长度: ${token.length}`);
   const data = JSON.stringify({
     token: token,
     title: title,
@@ -100,7 +101,7 @@ async function sendNotification(result) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Content-Length": data.length
+      "Content-Length": Buffer.byteLength(data)
     }
   };
 
