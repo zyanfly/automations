@@ -38,4 +38,5 @@ jobs:
       - run: node scripts/newapi-checkin.js
         env:
           NEWAPI_COOKIE: ${{ secrets.NEWAPI_COOKIE }}
+          NEWAPI_USER: ${{ secrets.NEWAPI_USER }}
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}

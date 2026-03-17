@@ -2,6 +2,7 @@ const https = require("https");
 
 async function checkin() {
   const cookie = process.env.NEWAPI_COOKIE;
+  const newApiUser = process.env.NEWAPI_USER;
 
   if (!cookie) {
     const result = {
@@ -17,7 +18,21 @@ async function checkin() {
     return;
   }
 
-  const result = await sendCheckinRequest(cookie);
+  if (!newApiUser) {
+    const result = {
+      status: 0,
+      ok: false,
+      text: "未配置 NEWAPI_USER"
+    };
+
+    console.log("checkin result:");
+    console.log(result);
+    await sendNotification(result);
+    process.exitCode = 1;
+    return;
+  }
+
+  const result = await sendCheckinRequest(cookie, newApiUser);
 
   console.log("checkin result:");
   console.log(result);
@@ -29,7 +44,7 @@ async function checkin() {
   }
 }
 
-function sendCheckinRequest(cookie) {
+function sendCheckinRequest(cookie, newApiUser) {
   const url = new URL("https://lc.zenscaleai.com/api/user/checkin");
   const data = "{}";
 
@@ -41,6 +56,7 @@ function sendCheckinRequest(cookie) {
       "Content-Type": "application/json",
       "Content-Length": Buffer.byteLength(data),
       Cookie: cookie,
+      "New-Api-User": newApiUser,
       "User-Agent": "Mozilla/5.0"
     }
   };
