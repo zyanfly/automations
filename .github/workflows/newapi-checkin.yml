@@ -1,28 +1,11 @@
-name: auto-checkin
+name: newapi-checkin
 
 on:
   schedule:
-    - cron: '18 0 * * *'
+    - cron: '23 0 * * *'
   workflow_dispatch:
 
 jobs:
-  checkin:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - run: npm install
-
-      - run: node scripts/checkin.js
-        env:
-          ANYROUTER_COOKIE: ${{ secrets.ANYROUTER_COOKIE }}
-          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
-
   newapi-checkin:
     runs-on: ubuntu-latest
 
