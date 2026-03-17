@@ -22,3 +22,20 @@ jobs:
         env:
           ANYROUTER_COOKIE: ${{ secrets.ANYROUTER_COOKIE }}
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+
+  newapi-checkin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install
+
+      - run: node scripts/newapi-checkin.js
+        env:
+          NEWAPI_COOKIE: ${{ secrets.NEWAPI_COOKIE }}
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
