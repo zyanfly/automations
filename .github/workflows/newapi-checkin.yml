@@ -1,8 +1,9 @@
 name: newapi-checkin
 
+# on:
+#   schedule:
+#     - cron: '23 0 * * *'
 on:
-  schedule:
-    - cron: '23 0 * * *'
   workflow_dispatch:
 
 jobs:
