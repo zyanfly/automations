@@ -2,7 +2,7 @@ name: anyrouter-checkin
 
 on:
   schedule:
-    - cron: '18 0 * * *'
+    - cron: '17 22 * * *'
   workflow_dispatch:
 
 jobs:
