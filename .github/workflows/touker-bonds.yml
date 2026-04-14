@@ -9,6 +9,8 @@ on:
 jobs:
   check-bonds:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,3 +24,9 @@ jobs:
         env:
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
         run: node scripts/touker-bonds.js
+
+      - name: Commit and Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: 更新打新历史记录"
+          file_pattern: 'scripts/bonds-history.json'
