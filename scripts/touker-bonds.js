@@ -1,6 +1,7 @@
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
+const { sendPushPlusNotification } = require("./pushplus");
 
 const TARGET_URL = "https://m.touker.com/stock/broadcast/index.htm";
 const HISTORY_FILE = path.join(__dirname, "bonds-history.json");
@@ -47,6 +48,13 @@ function fetchHtml(url) {
       }
     };
     https.get(url, options, (res) => {
+      const status = res.statusCode || 0;
+      if (status < 200 || status >= 300) {
+        res.resume();
+        reject(new Error(`抓取页面失败，HTTP 状态码: ${status}`));
+        return;
+      }
+
       let html = "";
       res.on("data", (chunk) => {
         html += chunk;
@@ -132,12 +140,6 @@ function parseBonds(html, history) {
  * 推送通知
  */
 async function sendNotification(bonds) {
-  const token = process.env.PUSHPLUS_TOKEN;
-  if (!token) {
-    console.log("未配置 PUSHPLUS_TOKEN，跳过推送");
-    return;
-  }
-
   if (bonds.length === 0) {
     return;
   }
@@ -149,42 +151,7 @@ async function sendNotification(bonds) {
   });
   content += "</ul><p>请及时前往证券 APP 进行预约。</p>";
 
-  console.log("准备发送通知...");
-  const data = JSON.stringify({
-    token,
-    title,
-    content,
-    template: "html"
-  });
-
-  const options = {
-    hostname: "www.pushplus.plus",
-    path: "/send",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(data)
-    }
-  };
-
-  return new Promise((resolve) => {
-    const req = https.request(options, (res) => {
-      let resultData = "";
-      res.on("data", (chunk) => {
-        resultData += chunk;
-      });
-      res.on("end", () => {
-        console.log("推送结果:", resultData);
-        resolve();
-      });
-    });
-    req.on("error", (err) => {
-      console.error("推送失败:", err);
-      resolve();
-    });
-    req.write(data);
-    req.end();
-  });
+  return sendPushPlusNotification({ title, content });
 }
 
 async function main() {

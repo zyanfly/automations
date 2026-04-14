@@ -1,4 +1,5 @@
 const https = require("https");
+const { sendPushPlusNotification } = require("./pushplus");
 
 async function checkin() {
   const cookie = process.env.NEWAPI_COOKIE;
@@ -92,54 +93,9 @@ function sendCheckinRequest(cookie, newApiUser) {
 }
 
 async function sendNotification(result) {
-  const token = process.env.PUSHPLUS_TOKEN;
-  if (!token) {
-    console.log("未配置 PUSHPLUS_TOKEN，跳过推送");
-    return;
-  }
-
   const title = `newAPI 签到结果: ${result.ok ? "成功" : "失败"}`;
   const content = `状态码: ${result.status}\n结果: ${result.text}`;
-
-  console.log(`准备发送通知，Token长度: ${token.length}`);
-  const data = JSON.stringify({
-    token,
-    title,
-    content,
-    template: "html"
-  });
-
-  const options = {
-    hostname: "www.pushplus.plus",
-    path: "/send",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(data)
-    }
-  };
-
-  return new Promise((resolve) => {
-    const req = https.request(options, (res) => {
-      let resultData = "";
-      res.on("data", (chunk) => {
-        resultData += chunk;
-      });
-      res.on("end", () => {
-        console.log(`通知发送完成，状态码: ${res.statusCode}`);
-        console.log("推送响应:", resultData);
-        resolve();
-      });
-    });
-
-    req.on("error", (error) => {
-      console.error("通知发送失败:", error);
-      resolve();
-    });
-
-    req.write(data);
-    req.end();
-  });
+  return sendPushPlusNotification({ title, content });
 }
 
 checkin();

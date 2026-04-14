@@ -1,34 +1,41 @@
 # automations
 
-用于托管两个自动签到任务，并通过 PushPlus 推送执行结果。
+用于托管自动签到和提醒脚本，并通过 PushPlus 推送执行结果。
 
-## 功能
+## 当前任务
 
-- `anyrouter-checkin`
-  - 脚本: `scripts/checkin.js`
-  - 工作流: `.github/workflows/anyrouter-checkin.yml`
-  - 站点: `https://anyrouter.top`
-  - 说明: 使用 `puppeteer-core` 在浏览器环境内发起签到请求
+### 1. `anyrouter-checkin`
 
-- `newapi-checkin`
-  - 脚本: `scripts/newapi-checkin.js`
-  - 工作流: `.github/workflows/newapi-checkin.yml`
-  - 接口: `https://lc.zenscaleai.com/api/user/checkin`
-  - 说明: 直接发送 HTTPS 请求，依赖 `Cookie` 和 `New-Api-User` 请求头
+- 脚本：`scripts/checkin.js`
+- 工作流：`.github/workflows/anyrouter-checkin.yml`
+- 站点：`https://anyrouter.top`
+- 触发方式：GitHub Actions 定时 + 手动触发
+- 当前 cron：`17 22 * * *`
+- 运行时间：
+  - UTC：每天 `22:17`
+  - 北京时间：每天 `06:17`
 
-## 定时触发
+### 2. `newapi-checkin`
 
-两个工作流当前都使用相同的 cron：
+- 脚本：`scripts/newapi-checkin.js`
+- 工作流：`.github/workflows/newapi-checkin.yml`
+- 接口：`https://lc.zenscaleai.com/api/user/checkin`
+- 触发方式：当前仅保留手动触发
+- 说明：通过 `Cookie` 和 `New-Api-User` 请求头执行签到
 
-```yaml
-schedule:
-  - cron: '18 0 * * *'
-```
+### 3. `touker-bonds`
 
-- UTC 时间: 每天 `00:18`
-- 北京时间: 每天 `08:18`
+- 脚本：`scripts/touker-bonds.js`
+- 工作流：`.github/workflows/touker-bonds.yml`
+- 页面：`https://m.touker.com/stock/broadcast/index.htm`
+- 触发方式：GitHub Actions 定时 + 手动触发
+- 当前 cron：`33 22 * * *`
+- 运行时间：
+  - UTC：每天 `22:33`
+  - 北京时间：每天 `06:33`
+- 说明：抓取页面中的可转债广播信息，发现新债时推送提醒，并自动更新 `scripts/bonds-history.json`
 
-如果需要改成别的非整点时间，直接修改对应 workflow 文件里的 `cron` 即可。
+如果需要调整执行时间，直接修改对应 workflow 文件中的 `cron`。
 
 ## GitHub Secrets
 
@@ -43,20 +50,17 @@ schedule:
 
 说明：
 
-- `anyrouter-checkin` 需要 `ANYROUTER_COOKIE` 和 `PUSHPLUS_TOKEN`
-- `newapi-checkin` 需要 `NEWAPI_COOKIE`、`NEWAPI_USER` 和 `PUSHPLUS_TOKEN`
-- 如果未配置 `PUSHPLUS_TOKEN`，脚本会跳过推送
+- `anyrouter-checkin` 需要 `ANYROUTER_COOKIE`
+- `newapi-checkin` 需要 `NEWAPI_COOKIE` 和 `NEWAPI_USER`
+- `PUSHPLUS_TOKEN` 为可选项；未配置时脚本会跳过推送
 
 ## 手动执行
 
-两个 workflow 都保留了 `workflow_dispatch`，可以在 GitHub Actions 页面手动运行：
-
-- `anyrouter-checkin`
-- `newapi-checkin`
+三个 workflow 都保留了 `workflow_dispatch`，可在 GitHub Actions 页面手动运行。
 
 ## 本地运行
 
-安装依赖：
+先安装依赖：
 
 ```bash
 npm install
@@ -74,15 +78,25 @@ ANYROUTER_COOKIE='your_cookie' PUSHPLUS_TOKEN='your_token' node scripts/checkin.
 NEWAPI_COOKIE='your_cookie' NEWAPI_USER='your_user' PUSHPLUS_TOKEN='your_token' node scripts/newapi-checkin.js
 ```
 
+执行 Touker 新债提醒：
+
+```bash
+PUSHPLUS_TOKEN='your_token' node scripts/touker-bonds.js
+```
+
 ## 目录
 
 ```text
 .
 ├── .github/workflows/
 │   ├── anyrouter-checkin.yml
-│   └── newapi-checkin.yml
+│   ├── newapi-checkin.yml
+│   └── touker-bonds.yml
 ├── scripts/
+│   ├── bonds-history.json
 │   ├── checkin.js
-│   └── newapi-checkin.js
+│   ├── newapi-checkin.js
+│   ├── pushplus.js
+│   └── touker-bonds.js
 └── package.json
 ```
