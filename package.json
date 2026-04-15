@@ -1,7 +1,14 @@
 {
-  "name": "auto-checkin",
-  "version": "1.0.0",
-  "dependencies": {
-    "puppeteer-core": "^22.0.0"
-  }
+	"name": "auto-checkin",
+	"version": "1.0.0",
+	"dependencies": {
+		"puppeteer-core": "^22.0.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.12"
+	},
+	"scripts": {
+		"format": "biome format --write .",
+		"check": "biome check ."
+	}
 }
