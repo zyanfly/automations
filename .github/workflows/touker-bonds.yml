@@ -3,7 +3,7 @@ name: Touker Bonds Check
 on:
   schedule:
     # 每天北京时间 09:00 (UTC 01:00)
-    - cron: '33 22 * * *'
+    - cron: '33 23 * * *'
   workflow_dispatch:
 
 jobs:
@@ -28,5 +28,5 @@ jobs:
       - name: Commit and Push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: 更新打新历史记录"
+          commit_message: 'chore: 更新打新历史记录'
           file_pattern: 'scripts/bonds-history.json'
