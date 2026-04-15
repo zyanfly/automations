@@ -76,21 +76,6 @@ function parseBonds(html, history) {
   const parts = html.split('<div class="broadcast-item');
   parts.shift(); // 第一部分是 header
 
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-
-  const formatDate = (date) => {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  };
-
-  const todayStr = formatDate(today);
-  const tomorrowStr = formatDate(tomorrow);
-  console.log(`[Debug] 判定日期 - 今日: ${todayStr}, 明日: ${tomorrowStr}`);
-
   parts.forEach((part, index) => {
     const tagMatch = part.match(/<div class="tag">([^<]+)<\/div>/);
     const idMatch = part.match(/<div class="item-id">([^<]+)<span>(\d+)<\/span>/);
@@ -117,19 +102,9 @@ function parseBonds(html, history) {
       return;
     }
 
-    // 提醒策略：如果是债，无条件提醒并入库；如果是由于其他类型（如股），保留日期判断逻辑
-    let shouldNotify = false;
-    if (isBond) {
-      shouldNotify = true;
-      console.log(`[Debug]   -> 可转债类型，开启全局提醒`);
-    } else {
-      shouldNotify = tag === "今日申购" || tag === todayStr || tag === "明日申购" || tag === tomorrowStr;
-    }
-
-    if (shouldNotify) {
-      console.log(`[Debug]   -> 匹配成功!`);
-      bonds.push({ tag, name, code });
-    }
+    console.log(`[Debug]   -> 可转债类型，开启全局提醒`);
+    console.log(`[Debug]   -> 匹配成功!`);
+    bonds.push({ tag, name, code });
   });
 
   console.log(`[Debug] 本次新增匹配 ${bonds.length} 个项目`);

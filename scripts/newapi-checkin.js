@@ -5,27 +5,9 @@ async function checkin() {
   const cookie = process.env.NEWAPI_COOKIE;
   const newApiUser = process.env.NEWAPI_USER;
 
-  if (!cookie) {
-    const result = {
-      status: 0,
-      ok: false,
-      text: "未配置 NEWAPI_COOKIE"
-    };
-
-    console.log("checkin result:");
-    console.log(result);
-    await sendNotification(result);
-    process.exitCode = 1;
-    return;
-  }
-
-  if (!newApiUser) {
-    const result = {
-      status: 0,
-      ok: false,
-      text: "未配置 NEWAPI_USER"
-    };
-
+  const missing = !cookie ? "NEWAPI_COOKIE" : !newApiUser ? "NEWAPI_USER" : null;
+  if (missing) {
+    const result = { status: 0, ok: false, text: `未配置 ${missing}` };
     console.log("checkin result:");
     console.log(result);
     await sendNotification(result);
