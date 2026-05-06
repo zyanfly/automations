@@ -1,4 +1,4 @@
-const https = require("https");
+const https = require("node:https");
 const { sendPushPlusNotification } = require("./pushplus");
 
 async function checkin() {
