@@ -35,6 +35,18 @@
   - 北京时间：每天 `06:33`
 - 说明：抓取页面中的可转债广播信息，发现新债时推送提醒，并自动更新 `scripts/bonds-history.json`
 
+### 4. `ikuuu-checkin`
+
+- 脚本：`scripts/ikuuu-checkin.js`
+- 工作流：`.github/workflows/ikuuu-checkin.yml`
+- 接口：`https://ikuuu.org/user/checkin`
+- 触发方式：GitHub Actions 定时 + 手动触发
+- 当前 cron：`9 23 * * *`
+- 运行时间：
+  - UTC：每天 `23:09`
+  - 北京时间：每天 `07:09`
+- 说明：通过 `Cookie` 执行签到；“今日已签到”也会按成功处理
+
 如果需要调整执行时间，直接修改对应 workflow 文件中的 `cron`。
 
 ## GitHub Secrets
@@ -46,17 +58,19 @@
 | `ANYROUTER_COOKIE` | AnyRouter 登录态 cookie           |
 | `NEWAPI_COOKIE`    | newAPI 登录态 cookie              |
 | `NEWAPI_USER`      | newAPI 请求头 `New-Api-User` 的值 |
+| `IKUUU_COOKIE`     | IKUUU 登录态 cookie               |
 | `PUSHPLUS_TOKEN`   | PushPlus 推送 token               |
 
 说明：
 
 - `anyrouter-checkin` 需要 `ANYROUTER_COOKIE`
 - `newapi-checkin` 需要 `NEWAPI_COOKIE` 和 `NEWAPI_USER`
+- `ikuuu-checkin` 需要 `IKUUU_COOKIE`
 - `PUSHPLUS_TOKEN` 为可选项；未配置时脚本会跳过推送
 
 ## 手动执行
 
-三个 workflow 都保留了 `workflow_dispatch`，可在 GitHub Actions 页面手动运行。
+所有 workflow 都保留了 `workflow_dispatch`，可在 GitHub Actions 页面手动运行。
 
 ## 本地运行
 
@@ -78,6 +92,12 @@ ANYROUTER_COOKIE='your_cookie' PUSHPLUS_TOKEN='your_token' node scripts/checkin.
 NEWAPI_COOKIE='your_cookie' NEWAPI_USER='your_user' PUSHPLUS_TOKEN='your_token' node scripts/newapi-checkin.js
 ```
 
+执行 IKUUU 签到：
+
+```bash
+IKUUU_COOKIE='your_cookie' PUSHPLUS_TOKEN='your_token' node scripts/ikuuu-checkin.js
+```
+
 执行 Touker 新债提醒：
 
 ```bash
@@ -90,11 +110,13 @@ PUSHPLUS_TOKEN='your_token' node scripts/touker-bonds.js
 .
 ├── .github/workflows/
 │   ├── anyrouter-checkin.yml
+│   ├── ikuuu-checkin.yml
 │   ├── newapi-checkin.yml
 │   └── touker-bonds.yml
 ├── scripts/
 │   ├── bonds-history.json
 │   ├── checkin.js
+│   ├── ikuuu-checkin.js
 │   ├── newapi-checkin.js
 │   ├── pushplus.js
 │   └── touker-bonds.js

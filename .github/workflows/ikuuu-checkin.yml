@@ -1,0 +1,25 @@
+name: ikuuu-checkin
+
+on:
+  schedule:
+    # 每天北京时间 07:09（UTC 23:09）
+    - cron: '9 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  ikuuu-checkin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install
+
+      - run: node scripts/ikuuu-checkin.js
+        env:
+          IKUUU_COOKIE: ${{ secrets.IKUUU_COOKIE }}
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
