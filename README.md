@@ -40,11 +40,7 @@
 - 脚本：`scripts/ikuuu-checkin.js`
 - 工作流：`.github/workflows/ikuuu-checkin.yml`
 - 接口：`https://ikuuu.org/user/checkin`
-- 触发方式：GitHub Actions 定时 + 手动触发
-- 当前 cron：`9 23 * * *`
-- 运行时间：
-  - UTC：每天 `23:09`
-  - 北京时间：每天 `07:09`
+- 触发方式：仅支持 GitHub Actions 手动触发（自动签到已关闭）
 - 说明：通过 `Cookie` 执行签到；“今日已签到”也会按成功处理
 
 如果需要调整执行时间，直接修改对应 workflow 文件中的 `cron`。

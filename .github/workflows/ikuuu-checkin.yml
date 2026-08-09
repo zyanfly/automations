@@ -1,9 +1,6 @@
 name: ikuuu-checkin
 
 on:
-  schedule:
-    # 每天北京时间 07:09（UTC 23:09）
-    - cron: '9 23 * * *'
   workflow_dispatch:
 
 jobs:
