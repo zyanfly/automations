@@ -1,0 +1,32 @@
+name: weijia-checkin
+
+on:
+  schedule:
+    - cron: '17 9 * * *'
+      timezone: Asia/Shanghai
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weijia-checkin
+  cancel-in-progress: false
+
+jobs:
+  weijia-checkin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: node scripts/weijia-checkin.js
+        env:
+          WEIJIA_CORPID: ${{ secrets.WEIJIA_CORPID }}
+          WEIJIA_COOKIE: ${{ secrets.WEIJIA_COOKIE }}
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
