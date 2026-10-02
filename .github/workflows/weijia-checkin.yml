@@ -1,9 +1,6 @@
 name: weijia-checkin
 
 on:
-  schedule:
-    - cron: '17 9 * * *'
-      timezone: Asia/Shanghai
   workflow_dispatch:
 
 permissions:

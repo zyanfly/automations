@@ -48,8 +48,7 @@
 - 脚本：`scripts/weijia-checkin.js`
 - 工作流：`.github/workflows/weijia-checkin.yml`
 - 站点：`https://qy.51vj.cn/app/home/culture`
-- 触发方式：GitHub Actions 定时 + 手动触发
-- 运行时间：北京时间每天 `09:17`
+- 触发方式：仅支持 GitHub Actions 手动触发（自动签到已关闭）
 - 说明：先查询当天状态，未签到才提交一次；会话过期时失败并提醒
 
 如果需要调整执行时间，直接修改对应 workflow 文件中的 `cron`。
